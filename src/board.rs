@@ -25,18 +25,41 @@ impl Board {
         }
     }
 
+    pub fn turn(&self) -> Player {
+        self.turn
+    }
 
-    pub fn place(&mut self, hole: usize) -> Result<(), ()> {
-        if hole > 8 {
-            return Err(())
+    pub fn draw(&self) -> bool {
+        self.placements
+            .iter()
+            .all(
+                |hole| hole[7]
+                .is_some()
+                )
+    }
+
+    pub fn game_over(&self) -> bool {
+        self.draw() || self.winner().is_some()
+    }
+
+    pub fn valid_move(&self, hole: usize) -> bool {
+        if hole > 7 {
+            return false;
         }
 
         if self.placements[hole][7].is_some() {
-            return Err(())
+            return false;
         }
 
-        if self.winner().is_some() {
-            return Err(())
+        if self.game_over() {
+            return false;
+        }
+        true
+    }
+
+    pub fn place(&mut self, hole: usize) -> Result<(), ()> {
+        if !self.valid_move(hole) {
+            return Err(());
         }
 
         for spot in &mut self.placements[hole] {
@@ -52,7 +75,7 @@ impl Board {
         }
         Ok(())
     }
-    
+
     pub fn winner(&self) -> Option<Player> {
         let _four_in_row_old = |coins: [Option<Coin>; 4]| {
             if coins[0].is_some() && coins.iter().all(|c| c == &coins[0]) {
@@ -75,41 +98,32 @@ impl Board {
             for window in windows {
                 let result = four_in_row(window);
                 if result.is_some() {
-                    return result
+                    return result;
                 }
-            } /*
-            for spot in 0..hole.len() - 4 {
-                let result = _four_in_row_old([hole[spot], hole[spot+1], hole[spot+2], hole[spot+3]]);
-                if result.is_some() {
-                    return result
-                }
-
             }
-            */
         }
-        //test horizontal 
+
+        //test horizontal
         for line in self.lines() {
             let windows = line.windows(4);
             for window in windows {
                 let result = four_in_row(window);
                 if result.is_some() {
-                    return result
+                    return result;
                 }
             }
-
         }
 
         //test diagonal
-        //idea: maybe do one of the two previous with on rotated iterators 
+        //idea: maybe do one of the two previous with on rotated iterators
         //(rot(1,[1,2,3]) == [3,1,2])
-        return None
+        return None;
     }
 
-    fn lines<'a>(&'a self) -> LineIter<'a>{
-        return LineIter::new(self)
+    fn lines<'a>(&'a self) -> LineIter<'a> {
+        return LineIter::new(self);
     }
 }
-
 
 impl Display for Coin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -151,11 +165,11 @@ impl Default for Board {
 
 struct LineIter<'a> {
     line: usize,
-    board: &'a Board
+    board: &'a Board,
 }
 impl<'a> LineIter<'a> {
     fn new(board: &'a Board) -> Self {
-        return LineIter {line: 0, board} 
+        return LineIter { line: 0, board };
     }
 }
 impl<'a> Iterator for LineIter<'a> {
@@ -167,7 +181,8 @@ impl<'a> Iterator for LineIter<'a> {
 
         if self.line <= 8 {
             let placements = &self.board.placements;
-            Some([placements[0][line],
+            Some([
+                placements[0][line],
                 placements[1][line],
                 placements[2][line],
                 placements[3][line],
@@ -176,7 +191,6 @@ impl<'a> Iterator for LineIter<'a> {
                 placements[6][line],
                 placements[7][line],
             ])
-            
         } else {
             None
         }
