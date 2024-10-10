@@ -115,12 +115,12 @@ impl Board {
         }
 
         //test diagonal
-        //idea: maybe do one of the two previous with on rotated iterators
+        //idea: maybe do one of the two previous with rotated iterators
         //(rot(1,[1,2,3]) == [3,1,2])
-        return None;
+        None
     }
 
-    fn lines<'a>(&'a self) -> LineIter<'a> {
+    fn lines(&self) -> LineIter<'_> {
         return LineIter::new(self);
     }
 }
@@ -169,7 +169,7 @@ struct LineIter<'a> {
 }
 impl<'a> LineIter<'a> {
     fn new(board: &'a Board) -> Self {
-        return LineIter { line: 0, board };
+        LineIter { line: 0, board }
     }
 }
 impl<'a> Iterator for LineIter<'a> {
