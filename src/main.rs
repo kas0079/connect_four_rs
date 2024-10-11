@@ -1,35 +1,25 @@
 mod board;
+mod player_agent;
 #[cfg(test)]
 mod tests;
-use std::io::{self, Write};
+use board::Board;
+use player_agent::human::human;
+use player_agent::random::random_move;
 
-fn game_loop() {
-    let mut game = board::Board::new();
+fn game_loop(
+        player_1: fn(&Board) -> usize,
+        player_2: fn(&Board) -> usize,
+        print_game: bool) {
+
+    let mut game = Board::new();
+    let mut players = [player_1, player_2].into_iter().cycle();
     while !game.game_over() {
-        let mut guess = String::new();
-        println!("{game}");
-        print!("player {} Please select a hole (0..7): ", game.turn());
-        io::stdout().flush().expect("flush failed?");
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("failed to read line");
-        let mut hole = guess.trim().parse::<usize>();
-        while !match hole {
-            Ok(num) if game.valid_move(num) => {
-                game.place(num).unwrap();
-                true
-            }
-            _ => false,
-        } {
-            println!("Invalid move!");
-            print!("player {} Please select a hole (0..7): ", game.turn());
-            io::stdout().flush().expect("flush failed?");
-            guess.clear();
-            io::stdin()
-                .read_line(&mut guess)
-                .expect("failed to read_line");
-            hole = guess.trim().parse::<usize>();
+        if print_game {
+            println!("{game}");
         }
+        let turn_player = players.next().unwrap();
+        let player_move = turn_player(&game);
+        game.place(player_move).unwrap()
     }
     println!("{game}");
     match game.winner() {
@@ -39,5 +29,5 @@ fn game_loop() {
 }
 
 fn main() {
-    game_loop()
+    game_loop(human, random_move, false)
 }
