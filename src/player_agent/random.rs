@@ -1,5 +1,5 @@
-use rand::{thread_rng, Rng};
 use crate::board::Board;
+use rand::{thread_rng, Rng};
 
 pub(crate) fn random_move(game: &Board) -> usize {
     let mut rng = thread_rng();

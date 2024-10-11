@@ -27,12 +27,7 @@ impl Board {
     }
 
     pub fn draw(&self) -> bool {
-        self.placements
-            .iter()
-            .all(
-                |hole| hole[7]
-                .is_some()
-                )
+        self.placements.iter().all(|hole| hole[7].is_some())
     }
 
     pub fn game_over(&self) -> bool {
@@ -123,27 +118,25 @@ impl Board {
                 let placements = self.placements;
                 let diagonal = [
                     placements[x][y],
-                    placements[x+1][y+1],
-                    placements[x+2][y+2],
-                    placements[x+3][y+3],
+                    placements[x + 1][y + 1],
+                    placements[x + 2][y + 2],
+                    placements[x + 3][y + 3],
                 ];
                 let result = four_in_row(&diagonal);
                 if result.is_some() {
                     return result;
                 }
-
             }
         }
 
-        
         for x in 0..5 {
             for y in (3..8).rev() {
                 let placements = self.placements;
                 let reverse_diagonal = [
                     placements[x][y],
-                    placements[x+1][y-1],
-                    placements[x+2][y-2],
-                    placements[x+3][y-3],
+                    placements[x + 1][y - 1],
+                    placements[x + 2][y - 2],
+                    placements[x + 3][y - 3],
                 ];
                 let reverse_result = four_in_row(&reverse_diagonal);
                 if reverse_result.is_some() {

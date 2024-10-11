@@ -6,11 +6,7 @@ use board::Board;
 use player_agent::human::human;
 use player_agent::random::random_move;
 
-fn game_loop(
-        player_1: fn(&Board) -> usize,
-        player_2: fn(&Board) -> usize,
-        print_game: bool) {
-
+fn game_loop(player_1: fn(&Board) -> usize, player_2: fn(&Board) -> usize, print_game: bool) {
     let mut game = Board::new();
     let mut players = [player_1, player_2].into_iter().cycle();
     while !game.game_over() {
@@ -29,5 +25,5 @@ fn game_loop(
 }
 
 fn main() {
-    game_loop(human, random_move, false)
+    game_loop(human, random_move, true)
 }

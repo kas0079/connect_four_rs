@@ -18,7 +18,7 @@ pub(crate) fn human(game: &board::Board) -> usize {
     loop {
         match hole {
             Ok(n) if game.valid_move(n) => return n,
-            _ => ()
+            _ => (),
         }
         println!("Invalid move!");
         hole = get_move(game);
