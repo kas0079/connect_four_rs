@@ -5,8 +5,9 @@ mod tests;
 use board::Board;
 use player_agent::human::human;
 use player_agent::random::random_move;
+use player_agent::PlayerAgent;
 
-fn game_loop(player_1: fn(&Board) -> usize, player_2: fn(&Board) -> usize, print_game: bool) {
+fn game_loop(player_1: PlayerAgent, player_2: PlayerAgent, print_game: bool) {
     let mut game = Board::new();
     let mut players = [player_1, player_2].into_iter().cycle();
     while !game.game_over() {
