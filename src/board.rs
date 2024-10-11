@@ -8,9 +8,6 @@ pub enum Coin {
 
 type Player = Coin;
 
-#[derive(Debug, Clone)]
-pub struct OutOfBoundsError;
-
 #[derive(Debug)]
 pub(crate) struct Board {
     placements: [[Option<Coin>; 8]; 8],
@@ -55,6 +52,10 @@ impl Board {
             return false;
         }
         true
+    }
+    #[allow(dead_code)]
+    pub(crate) fn put_debug(&mut self, x: usize, y: usize) {
+        self.placements[x][y] = Some(Coin::Red)
     }
 
     pub fn place(&mut self, hole: usize) -> Result<(), ()> {
@@ -117,6 +118,39 @@ impl Board {
         //test diagonal
         //idea: maybe do one of the two previous with rotated iterators
         //(rot(1,[1,2,3]) == [3,1,2])
+        for x in 0..5 {
+            for y in 0..5 {
+                let placements = self.placements;
+                let diagonal = [
+                    placements[x][y],
+                    placements[x+1][y+1],
+                    placements[x+2][y+2],
+                    placements[x+3][y+3],
+                ];
+                let result = four_in_row(&diagonal);
+                if result.is_some() {
+                    return result;
+                }
+
+            }
+        }
+
+        
+        for x in 0..5 {
+            for y in (3..8).rev() {
+                let placements = self.placements;
+                let reverse_diagonal = [
+                    placements[x][y],
+                    placements[x+1][y-1],
+                    placements[x+2][y-2],
+                    placements[x+3][y-3],
+                ];
+                let reverse_result = four_in_row(&reverse_diagonal);
+                if reverse_result.is_some() {
+                    return reverse_result;
+                }
+            }
+        }
         None
     }
 
@@ -153,6 +187,7 @@ impl Display for Board {
                 a.push('\n')
             }
         }
+        a.push_str("\n 0 1 2 3 4 5 6 7");
         write!(f, "{a}")
     }
 }
@@ -181,6 +216,7 @@ impl<'a> Iterator for LineIter<'a> {
 
         if self.line <= 8 {
             let placements = &self.board.placements;
+            //hate this
             Some([
                 placements[0][line],
                 placements[1][line],
