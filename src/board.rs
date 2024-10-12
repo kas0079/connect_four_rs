@@ -34,7 +34,7 @@ impl Board {
         self.draw() || self.winner().is_some()
     }
     pub fn actions(&self) -> Vec<usize> {
-        (0..8).filter(|m| self.valid_move(m.clone())).collect()
+        (0..8).filter(|m| self.valid_move(*m)).collect()
     }
 
     pub fn result(&self, hole: usize) -> Self {

@@ -1,5 +1,3 @@
-use std::f64::{INFINITY, NEG_INFINITY};
-
 use rand::{seq::SliceRandom, Rng};
 
 use crate::{board, Board};
@@ -14,7 +12,7 @@ pub fn minimax(max_depth: u32) -> Box<dyn Fn(&Board) -> usize> {
 #[allow(dead_code)]
 pub fn alpha_beta_search(state: &Board, max_depth: u32) -> usize {
     let player = state.turn();
-    let (_, game_move) = max_value(state, player, NEG_INFINITY, INFINITY, max_depth);
+    let (_, game_move) = max_value(state, player, f64::NEG_INFINITY, f64::INFINITY, max_depth);
     game_move.unwrap()
 }
 
@@ -23,7 +21,7 @@ fn max_value(state: &Board, player: board::Player, mut alpha: f64, beta: f64, de
     if depth == 0 || state.game_over() {
         return (evaluate(state, player), None)
     }
-    let mut v = NEG_INFINITY;
+    let mut v = f64::NEG_INFINITY;
     let mut game_move: Option<usize> = None;
     let mut rng = rand::thread_rng();
     let mut actions = state.actions();
@@ -45,7 +43,7 @@ fn min_value(state: &Board, player: board::Player, alpha: f64, mut beta: f64, de
     if depth == 0 || state.game_over() {
         return (evaluate(state, player), None)
     }
-    let mut v = INFINITY;
+    let mut v = f64::INFINITY;
     let mut game_move: Option<usize> = None;
     let mut rng = rand::thread_rng();
     let mut actions = state.actions();
