@@ -32,6 +32,7 @@ fn game_loop(player_1: PlayerAgent, player_2: PlayerAgent, print_game: bool) {
 }
 
 fn main() {
+    println!("reduce MAX_DEPTH in main.rs if the game is too slow.");
     let player_2 = |game: &Board| alpha_beta_search(game, MAX_DEPTH);
     game_loop(human, player_2, true)
 }
