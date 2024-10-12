@@ -6,9 +6,9 @@ pub enum Coin {
     Blue,
 }
 
-type Player = Coin;
+pub type Player = Coin;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Board {
     placements: [[Option<Coin>; 8]; 8],
     turn: Player,
@@ -32,6 +32,15 @@ impl Board {
 
     pub fn game_over(&self) -> bool {
         self.draw() || self.winner().is_some()
+    }
+    pub fn actions(&self) -> Vec<usize> {
+        (0..8).filter(|m| self.valid_move(m.clone())).collect()
+    }
+
+    pub fn result(&self, hole: usize) -> Self {
+        let mut board = self.clone();
+        board.place(hole).expect("Cannot create new board with the provided move");
+        board
     }
 
     pub fn valid_move(&self, hole: usize) -> bool {

@@ -3,9 +3,15 @@ mod player_agent;
 #[cfg(test)]
 mod tests;
 use board::Board;
+#[allow(unused_imports)]
 use player_agent::human::human;
+#[allow(unused_imports)]
 use player_agent::random::random_move;
 use player_agent::PlayerAgent;
+#[allow(unused_imports)]
+use player_agent::minimax::alpha_beta_search;
+
+const MAX_DEPTH: u32 = 8;
 
 fn game_loop(player_1: PlayerAgent, player_2: PlayerAgent, print_game: bool) {
     let mut game = Board::new();
@@ -26,5 +32,6 @@ fn game_loop(player_1: PlayerAgent, player_2: PlayerAgent, print_game: bool) {
 }
 
 fn main() {
-    game_loop(human, random_move, true)
+    let player_2 = |game: &Board| alpha_beta_search(game, MAX_DEPTH);
+    game_loop(human, player_2, true)
 }
