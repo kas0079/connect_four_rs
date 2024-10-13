@@ -51,10 +51,11 @@ impl Board {
         if self.placements[hole][7].is_some() {
             return false;
         }
-
+        /*
         if self.game_over() {
             return false;
         }
+        */
         true
     }
     #[allow(dead_code)]
