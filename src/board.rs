@@ -39,7 +39,9 @@ impl Board {
 
     pub fn result(&self, hole: usize) -> Self {
         let mut board = self.clone();
-        board.place(hole).expect("Cannot create new board with the provided move");
+        board
+            .place(hole)
+            .expect("Cannot create new board with the provided move");
         board
     }
 

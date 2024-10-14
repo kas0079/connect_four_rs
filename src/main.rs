@@ -6,12 +6,12 @@ use board::Board;
 #[allow(unused_imports)]
 use player_agent::human::human;
 #[allow(unused_imports)]
+use player_agent::minimax::alpha_beta_search;
+#[allow(unused_imports)]
 use player_agent::random::random_move;
 use player_agent::PlayerAgent;
-#[allow(unused_imports)]
-use player_agent::minimax::alpha_beta_search;
 
-const MAX_DEPTH: u32 = 8;
+const MAX_DEPTH: u32 = 10;
 
 fn game_loop(player_1: PlayerAgent, player_2: PlayerAgent, print_game: bool) {
     let mut game = Board::new();

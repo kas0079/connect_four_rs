@@ -17,9 +17,15 @@ pub fn alpha_beta_search(state: &Board, max_depth: u32) -> usize {
 }
 
 /// Returns the utility and a move.
-fn max_value(state: &Board, player: board::Player, mut alpha: f64, beta: f64, depth: u32) -> (f64, Option<usize>) {
+fn max_value(
+    state: &Board,
+    player: board::Player,
+    mut alpha: f64,
+    beta: f64,
+    depth: u32,
+) -> (f64, Option<usize>) {
     if depth == 0 || state.game_over() {
-        return (evaluate(state, player), None)
+        return (evaluate(state, player), None);
     }
     let mut v = f64::NEG_INFINITY;
     let mut game_move: Option<usize> = None;
@@ -34,14 +40,20 @@ fn max_value(state: &Board, player: board::Player, mut alpha: f64, beta: f64, de
             alpha = f64::max(alpha, v);
         }
         if v >= beta {
-            return (v, game_move)
+            return (v, game_move);
         }
     }
     (v, game_move)
 }
-fn min_value(state: &Board, player: board::Player, alpha: f64, mut beta: f64, depth: u32) -> (f64, Option<usize>) {
+fn min_value(
+    state: &Board,
+    player: board::Player,
+    alpha: f64,
+    mut beta: f64,
+    depth: u32,
+) -> (f64, Option<usize>) {
     if depth == 0 || state.game_over() {
-        return (evaluate(state, player), None)
+        return (evaluate(state, player), None);
     }
     let mut v = f64::INFINITY;
     let mut game_move: Option<usize> = None;
@@ -56,7 +68,7 @@ fn min_value(state: &Board, player: board::Player, alpha: f64, mut beta: f64, de
             beta = f64::min(beta, v);
         }
         if v <= alpha {
-            return (v, game_move)
+            return (v, game_move);
         }
     }
     (v, game_move)
@@ -73,11 +85,13 @@ fn evaluate(state: &Board, player: board::Player) -> f64 {
 
 fn utility(state: &Board, player: board::Player) -> f64 {
     match state.winner() {
-        Some(winner) => if winner == player {
-            1f64
-        } else {
-            -1f64
-        },
+        Some(winner) => {
+            if winner == player {
+                1f64
+            } else {
+                -1f64
+            }
+        }
         None => 0f64,
     }
 }
