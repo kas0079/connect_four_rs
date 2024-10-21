@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+const LENGTH: usize = 8;
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Coin {
     Red,
@@ -10,14 +11,14 @@ pub type Player = Coin;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Board {
-    placements: [[Option<Coin>; 8]; 8],
+    placements: [[Option<Coin>; LENGTH]; LENGTH],
     turn: Player,
 }
 
 impl Board {
     pub fn new() -> Self {
         Self {
-            placements: [[None; 8]; 8],
+            placements: [[None; LENGTH]; LENGTH],
             turn: Coin::Red,
         }
     }
@@ -34,7 +35,7 @@ impl Board {
         self.draw() || self.winner().is_some()
     }
     pub fn actions(&self) -> Vec<usize> {
-        (0..8).filter(|m| self.valid_move(*m)).collect()
+        (0..LENGTH).filter(|m| self.valid_move(*m)).collect()
     }
 
     pub fn result(&self, hole: usize) -> Self {
@@ -142,7 +143,7 @@ impl Board {
         }
 
         for x in 0..5 {
-            for y in (3..8).rev() {
+            for y in (3..LENGTH).rev() {
                 let placements = self.placements;
                 let reverse_diagonal = [
                     placements[x][y],
@@ -213,13 +214,13 @@ impl<'a> LineIter<'a> {
     }
 }
 impl<'a> Iterator for LineIter<'a> {
-    type Item = [Option<Coin>; 8];
+    type Item = [Option<Coin>; LENGTH];
 
     fn next(&mut self) -> Option<Self::Item> {
         let line = self.line;
         self.line += 1;
 
-        if self.line <= 8 {
+        if self.line <= LENGTH {
             let placements = &self.board.placements;
             //hate this
             Some([
