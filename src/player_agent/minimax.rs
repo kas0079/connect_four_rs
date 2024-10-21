@@ -1,6 +1,6 @@
 use rand::{seq::SliceRandom, Rng};
 
-use crate::{board, Board};
+use crate::board::{Player, Board};
 
 /*
  * FIXME This would be prettier in main.rs, but currently broken
@@ -19,7 +19,7 @@ pub fn alpha_beta_search(state: &Board, max_depth: u32) -> usize {
 /// Returns the utility and a move.
 fn max_value(
     state: &Board,
-    player: board::Player,
+    player: Player,
     mut alpha: f64,
     beta: f64,
     depth: u32,
@@ -47,7 +47,7 @@ fn max_value(
 }
 fn min_value(
     state: &Board,
-    player: board::Player,
+    player: Player,
     alpha: f64,
     mut beta: f64,
     depth: u32,
@@ -74,7 +74,7 @@ fn min_value(
     (v, game_move)
 }
 
-fn evaluate(state: &Board, player: board::Player) -> f64 {
+fn evaluate(state: &Board, player: Player) -> f64 {
     if state.game_over() {
         utility(state, player)
     } else {
@@ -83,7 +83,7 @@ fn evaluate(state: &Board, player: board::Player) -> f64 {
     }
 }
 
-fn utility(state: &Board, player: board::Player) -> f64 {
+fn utility(state: &Board, player: Player) -> f64 {
     match state.winner() {
         Some(winner) => {
             if winner == player {
