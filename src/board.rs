@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, ops};
 
-const LENGTH: usize = 8;
+pub const LENGTH: usize = 8;
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Coin {
     Red,
@@ -201,6 +201,14 @@ impl Display for Board {
 impl Default for Board {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ops::Index<(usize, usize)> for Board {
+    type Output = Option<Player>;
+
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
+        &self.placements[index.0][index.1]
     }
 }
 
