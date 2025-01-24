@@ -1,6 +1,11 @@
 use std::io;
+use std::io::Write;
+use std::thread;
+use std::sync::mpsc::channel;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
-use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
+use ratatui::crossterm::event::{self, KeyCode, KeyEventKind, poll};
 //use ratatui::widgets::StatefulWidget;
 use ratatui::DefaultTerminal;
 use ratatui::{prelude::*, widgets::*};
@@ -51,36 +56,68 @@ const PLACEMENT_KEY: [KeyCode;2] = [KeyCode::Enter, KeyCode::Down];
 fn game_loop_tui(mut terminal: DefaultTerminal) -> io::Result<()> {
     let mut state = BoardState::default();
     let mut game = Board::new();
+
+    let computers_turn = AtomicBool::new(false);
+    let (board_tx, board_rx) = channel();
+    let (computer_move_tx, computer_move_rx) = channel();
+    let _computer_player = std::thread::spawn(move ||
+        loop {
+            match board_rx.recv() {
+                Ok(board) => {
+                    let computer_move = alpha_beta_search(&board, MAX_DEPTH);
+                    computer_move_tx.send(computer_move).unwrap()
+                },
+                Err(_) => return,
+            }
+        }
+        );
     loop {
+        match computer_move_rx.try_recv() {
+            Ok(computer_move) => {
+                game.place(computer_move).unwrap();
+                if game.game_over() {
+                    //panic!("computer won");
+                    return Ok(())
+                }
+                computers_turn.store(false, Ordering::Relaxed);
+            },
+            Err(_) => (),
+        }
         terminal.draw(|frame| {
             let b = BoardWidget::new(game.clone());
             frame.render_stateful_widget(b, frame.area(), &mut state);
         })?;
         //TODO refactor into new function
-        if let event::Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                return Ok(())
-            }
-
-            if key.kind == KeyEventKind::Press && key.code == KeyCode::Right {
-                state.selection += 1;
-                state.selection %= 8;
-            }
-            if key.kind == KeyEventKind::Press && key.code == KeyCode::Left {
-                if state.selection == 0 {
-                    state.selection = 7;
-                } else {
-                    state.selection -= 1;
-                }
-            }
-            if key.kind == KeyEventKind::Press && PLACEMENT_KEY.contains(&key.code) {
-                game.place(state.selection.into())
-                    .expect("Selection should be a valid move");
-                if game.game_over() {
+        if poll(Duration::from_millis(100))? {
+            if let event::Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
                     return Ok(())
                 }
-            }
 
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Right {
+                    //TODO skip invalid selections
+                    state.selection += 1;
+                    state.selection %= 8;
+                }
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Left {
+                    //TODO skip invalid selection
+                    if state.selection == 0 {
+                        state.selection = 7;
+                    } else {
+                        state.selection -= 1;
+                    }
+                }
+                if key.kind == KeyEventKind::Press && PLACEMENT_KEY.contains(&key.code) && !computers_turn.load(Ordering::Relaxed) {
+                    game.place(state.selection.into())
+                        .expect("Selection should be a valid move");
+                    if game.game_over() {
+                        //panic!("human won");
+                        return Ok(())
+                    }
+                    computers_turn.store(true, Ordering::Relaxed);
+                    board_tx.send(game.clone()).unwrap()
+                }
+            }
         }
     }
 
@@ -96,14 +133,6 @@ impl BoardWidget {
         Self {board}
     }
 }
-
-/*
-impl Default for BoardWidget {
-    fn default() -> Self {
-        Self { board: Board::default() }
-    }
-}
-*/
 
 impl StatefulWidget for BoardWidget {
     type State = BoardState;
@@ -134,7 +163,6 @@ impl StatefulWidget for BoardWidget {
                 };
                 let spot = match self.board[(column, 7-row)] {
                     Some(player) => {
-
                         match player {
                             Coin::Red => Block::bordered()
                                 .on_red(),
